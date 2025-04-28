@@ -2,7 +2,7 @@ from telegram import Update
 import os
 from dotenv import load_dotenv
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
-from furia_bot_responses import requestDetailsMatches, requestLineUp
+from furia_bot_responses import requestDetailsMatches, requestLineUp, requestRanking, requestWinStreak
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Oi! Sou um BOT Furioso! 🤖")
@@ -26,6 +26,20 @@ async def lineup(update: Update, context: ContextTypes.DEFAULT_TYPE):
         texto,
         disable_web_page_preview=True
     )
+
+async def ranking(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    texto = requestRanking()
+    await update.message.reply_text(
+        texto,
+        disable_web_page_preview=True
+    )
+
+async def winstreak(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    texto = requestWinStreak()
+    await update.message.reply_text(
+        texto,
+        disable_web_page_preview=True
+    )
     
 
 if __name__ == '__main__':
@@ -37,6 +51,9 @@ if __name__ == '__main__':
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("partidas", partidas))
     app.add_handler(CommandHandler("lineup", lineup))
+    app.add_handler(CommandHandler("ranking", ranking))
+    app.add_handler(CommandHandler("winrate", winstreak))
+    app.add_handler(CommandHandler("winstreak", winstreak))
 
     print("bot ta rodando...")
     app.run_polling()

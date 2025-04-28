@@ -90,14 +90,92 @@ def requestLineUp():
     else:
         return(f"🔴Ih... Barrou 2 ! \n ‼️Error Code: {response.status_code}")
         
-# def requestRanking():
-#     url = ''
-#     scraper = cloudscraper.create_scraper()
-#     response = scraper.get(url)
+def requestRanking():
+    url = 'https://www.hltv.org/team/8297/furia'
+    scraper = cloudscraper.create_scraper()
+    response = scraper.get(url)
 
-#     if response.status_code == 200:
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text,'html.parser')   
+        rows = soup.find_all('div',{'flex-col','flex-col push-right'})
+        auxiliar_variable = []
+        count = 1
 
-#         print("fds")
-#     else:
-#         return(f"🔴Ih... Barrou 3 ! \n ‼️Error Code: {response.status_code}")
+        for row in rows:
+            ranking_hltv = row.select_one('div.flex span.value.h-rank').text.strip()
+            ranking_valve = row.select_one('div.flex span.value.v-rank').text.strip()
+            auxiliar_variable.append({
+                'ID': count,
+                'hltv': ranking_hltv,
+                'valve': ranking_valve
+            })
+            count += 1
 
+        result = 'INFORMAÇÕES RANKING - FURIA - LINEUP\n\n'
+        for info in auxiliar_variable:
+            if info['ID'] == 1:
+                result += f'🎖️ Ranking atual HLTV: {info['hltv']}\n'
+                result += f'🎖️ Ranking atual Valve: {info['valve']}\n'
+            if info['ID'] == 2:
+                result += f'🥇 Ranking mais alto HLTV da LINEUP: {info['hltv']}\n'
+                result += f'🥇 Ranking mais alto Valve da LINEUP: {info['valve']}\n'
+            if info['ID'] == 3:
+                result += f'📅 Tempo no ranking mais alto HLTV da LINEUP: {info["hltv"]}\n'
+                result += f'📅 Tempo no ranking mais alto Valve da LINEUP: {info["valve"]}\n\n'
+            if info['ID'] == 4:
+                result += 'INFORMAÇÕES RANKING - FURIA - ORGANIZAÇÃO\n\n'
+
+            if info['ID'] == 5:
+                result += f'🥇 Ranking mais alto HLTV do TIME: {info['hltv']}\n'
+                result += f'🥇 Ranking mais alto Valve do TIME: {info['valve']}\n'
+            if info['ID'] == 6:
+                result += f'📅 Tempo no ranking mais alto HLTV do TIME: {info["hltv"]}\n'
+                result += f'📅 Tempo no ranking mais alto Valve do TIME: {info["valve"]}\n\n'
+        return result
+
+
+    else:
+        return(f"🔴Ih... Barrou 3 ! \n ‼️Error Code: {response.status_code}")
+
+
+def requestNoticias():
+    url = 'https://www.hltv.org/team/8297/furia#tab-newsBox'
+    scraper = cloudscraper.create_scraper()
+    response = scraper.get(url)
+
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text,'html.parser')   
+
+def requestWinStreak():
+    url = 'https://www.hltv.org/team/8297/furia#tab-matchesBox'
+    scraper = cloudscraper.create_scraper()
+    response = scraper.get(url)
+    auxiliar_variable = []
+    count = 1
+
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text,'html.parser')   
+        rows = soup.find_all('div', 'highlighted-stat')
+        for row in rows:
+            if count == 1:
+                winstreak = row.select_one('div.stat').text.strip()
+                count += 1
+            elif count == 2:
+                if row.select_one('div.description').text.strip() == "Win rate":                
+                    winrate = row.select_one('div.stat').text.strip()
+                    count+= 1
+            else:
+                auxiliar_variable.append({
+                'winstreak': winstreak,
+                'winrate': winrate
+            })
+                break
+
+
+        result = 'WINSTREAK / WINRATE\n'
+        for info in auxiliar_variable:
+            result += f'🟨 WINSTREAK - {info['winstreak']} / WINRATE - {info['winrate']}'
+        return result
+
+def requestAllDetails():
+    print('penis')
