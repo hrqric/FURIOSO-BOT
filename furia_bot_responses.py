@@ -138,13 +138,39 @@ def requestRanking():
         return(f"🔴Ih... Barrou 3 ! \n ‼️Error Code: {response.status_code}")
 
 
-def requestNoticias():
+def requestNoticias(qtd):
     url = 'https://www.hltv.org/team/8297/furia#tab-newsBox'
     scraper = cloudscraper.create_scraper()
     response = scraper.get(url)
 
     if response.status_code == 200:
-        soup = BeautifulSoup(response.text,'html.parser')   
+        soup = BeautifulSoup(response.text,'html.parser')
+        rows = soup.select('#newsBox a.subTab-newsArticle')
+        news = []
+        id = 1
+
+        for row in rows:
+            if id <= qtd:
+                news_day = row.find('span').text
+                news_content = row.find('span').next_sibling.strip()
+                resume = news_day + ' - ' + news_content
+
+                href = row['href']
+                link = 'hltv.org' + href
+                news.append({
+                    'ID': id,
+                    'noticia': link,
+                    'resume': resume
+                })
+                id += 1
+            else:
+                break
+        result = f'ÚLTIMAS {qtd} NOTICIAS DA FÚRIA\n\n'
+        for n in news:
+            result += f'🗞️  {n['resume']}\n'
+            result += f'🔗 {n['noticia']}\n\n'
+        return result
+
 
 def requestWinStreak():
     url = 'https://www.hltv.org/team/8297/furia#tab-matchesBox'
